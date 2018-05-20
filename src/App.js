@@ -14,7 +14,8 @@ const ce = console.error;
  */
 class App extends Component {
   state = {
-    topStories: []
+    topStories: [],
+    hasError: false
   };
 
   repository = new StoryRepository();
@@ -22,13 +23,16 @@ class App extends Component {
   async componentDidMount() {
     try {
       const topStories = await this.repository.getTopStories();
-      this.setState({ topStories }, () => cl(`Yes!`));
+      this.setState({ topStories, hasError: false }, () => cl(`Yes!`));
     } catch (error) {
       ce(`Failed to retrieve stroies!!!`, error);
+      this.setState({ hasError: true });
     }
   }
 
   render() {
+    const { hasError } = this.state;
+
     return (
       <div className="App">
         <header className="App-header">
@@ -36,7 +40,11 @@ class App extends Component {
           <h1 className="App-title">Hacker News: Top Stories</h1>
         </header>
         <div className="App-intro">
-          <StoriesView stories={this.state.topStories} title="Top Stories" />
+          {hasError ? (
+            <div>Error retrieving stories!</div>
+          ) : (
+            <StoriesView stories={this.state.topStories} title="Top Stories" />
+          )}
         </div>
       </div>
     );
