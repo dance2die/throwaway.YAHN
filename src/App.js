@@ -3,6 +3,7 @@ import logo from "./logo.svg";
 import "./App.css";
 
 import StoryRepository from "./data/StoryRepository";
+import StoriesView from "./components/StoriesView";
 
 const cl = console.log;
 const ce = console.error;
@@ -12,20 +13,14 @@ const ce = console.error;
  * and pass it on to "view" components.
  */
 class App extends Component {
-  static state = {
+  state = {
     topStories: []
-    // ,newStories: [],
-    // bestStories: []
   };
 
   repository = new StoryRepository();
 
   async componentDidMount() {
     try {
-      // const topStories = await this.repository.getTopStories();
-      // const newStories = await this.repository.getNewStories();
-      // const bestStories = await this.repository.getBestStories();
-      // this.setState({ topStories, newStories, bestStories }, () => cl(`Yes!`));
       const topStories = await this.repository.getTopStories();
       this.setState({ topStories }, () => cl(`Yes!`));
     } catch (error) {
@@ -38,11 +33,11 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Hacker News: Top Stories</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <div className="App-intro">
+          <StoriesView stories={this.state.topStories} title="Top Stories" />
+        </div>
       </div>
     );
   }
