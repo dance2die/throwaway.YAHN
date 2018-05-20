@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import Api from "./Api";
+
+import StoryRepository from "./data/StoryRepository";
 
 const cl = console.log;
 const ce = console.error;
-const MAX_STORY_COUNT = 20;
 
 /**
  * This will be the "container" component, which will fetch HN data
@@ -14,43 +14,23 @@ const MAX_STORY_COUNT = 20;
 class App extends Component {
   static state = {
     topStories: []
+    // ,newStories: [],
+    // bestStories: []
   };
 
+  repository = new StoryRepository();
+
   async componentDidMount() {
-    // Fetch Top story IDs
-    // Fetch story details for top 20
-    // Upon fetch completion, set the state for topStories
-
     try {
-      const storyIds = await Api.fetch(`/topstories`, { context: this });
-      const topStories = await this.getStories(
-        storyIds.slice(0, MAX_STORY_COUNT)
-      );
-
-      this.setState({ topStories }, () =>
-        cl(`Stories are retrieved successfully!`)
-      );
+      // const topStories = await this.repository.getTopStories();
+      // const newStories = await this.repository.getNewStories();
+      // const bestStories = await this.repository.getBestStories();
+      // this.setState({ topStories, newStories, bestStories }, () => cl(`Yes!`));
+      const topStories = await this.repository.getTopStories();
+      this.setState({ topStories }, () => cl(`Yes!`));
     } catch (error) {
       ce(`Failed to retrieve stroies!!!`, error);
     }
-  }
-
-  async getStories(storyIds) {
-    const stories = storyIds.map((storyId, index) =>
-      this.getStory(storyId, index + 1)
-    );
-    return Promise.all(stories);
-  }
-
-  /**
-   * Get the story and set the rank
-   * @param {integer} storyId Id to get story for
-   * @param {integer} rank HN Ranking to set to
-   */
-  async getStory(storyId, rank) {
-    const story = await Api.fetch(`/item/${storyId}`, { context: this });
-    story.rank = rank;
-    return story;
   }
 
   render() {

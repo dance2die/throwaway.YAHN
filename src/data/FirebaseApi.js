@@ -11,7 +11,7 @@ let db = firebase.database();
 let base = rebase.createClass(db);
 
 // Api is a wrapper around base, to include the version child path to the binding automatically.
-const Api = {
+const FirebaseApi = {
   /**
    * One way data binding from Firebase to a component's state.
    * @param {string} endpoint
@@ -47,4 +47,4 @@ const Api = {
   }
 };
 
-export default Api;
+export default FirebaseApi;
