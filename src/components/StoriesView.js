@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Spinner from "react-spinkit";
+import StoryView from "./StoryView";
 
 class StoriesView extends Component {
   render() {
@@ -12,7 +13,10 @@ class StoriesView extends Component {
       );
     }
 
-    return <div>StoriesView!</div>;
+    const storyViews = stories.map(story => (
+      <StoryView key={story.id} story={story} />
+    ));
+    return <div>{storyViews}</div>;
   }
 }
 
