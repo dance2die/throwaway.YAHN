@@ -7,18 +7,33 @@ class StoriesView extends Component {
     const { stories } = this.props;
     if (!stories || stories.length === 0) {
       return (
-        <CenterView>
+        <SpinnerLayoutView>
           <Spinner name="ball-clip-rotate-multiple" color="coral" />
-        </CenterView>
+        </SpinnerLayoutView>
       );
     }
 
     const storyViews = stories.map(story => (
-      <StoryView key={story.id} story={story} />
+      <li key={story.id}>
+        <StoryView story={story} />
+      </li>
     ));
-    return <div>{storyViews}</div>;
+    return <StoryLayoutView>{storyViews}</StoryLayoutView>;
   }
 }
+
+const storyStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  justifyContent: "center",
+  padding: "50px",
+  textAlign: "left",
+  listStyle: "none"
+};
+const StoryLayoutView = ({ children }) => (
+  <ul style={storyStyle}>{children}</ul>
+);
 
 const centerStyle = {
   display: "flex",
@@ -26,6 +41,8 @@ const centerStyle = {
   justifyContent: "center",
   padding: "50px"
 };
-const CenterView = ({ children }) => <div style={centerStyle}>{children}</div>;
+const SpinnerLayoutView = ({ children }) => (
+  <div style={centerStyle}>{children}</div>
+);
 
 export default StoriesView;
