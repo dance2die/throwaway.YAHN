@@ -16,36 +16,48 @@ const MAX_STORY_COUNT = 30;
  */
 class App extends Component {
   state = {
+    page: this.props.match.params.page || 1,
+    topStoryIds: [],
     topStories: [],
     hasError: false
   };
 
-  repository = new StoryRepository();
+  repository = new StoryRepository(MAX_STORY_COUNT);
 
   async componentDidMount() {
     try {
-      // We need to fetch stories only once.
-      const { topStories: stories } = this.state;
-      if (stories.length > 0) return;
+      const { topStoryIds: storyIds, page } = this.state;
+      const repo = this.repository;
 
-      const topStories = await this.repository.getTopStories();
-      this.setState({ topStories, hasError: false }, () => cl(`Yes!`));
+      if (storyIds.length <= 0) {
+        const topStoryIds = await this.repository.getTopStoryIds();
+        this.setState({ topStoryIds, hasError: false }, async () => {
+          const ids = this._getStoryIdsByPage(topStoryIds, page);
+          const topStories = await repo.getStoriesByIds(ids, page);
+
+          this.setState({ topStories });
+        });
+      } else {
+        const ids = this._getStoryIdsByPage(storyIds, page);
+        const topStories = await repo.getStoriesByIds(ids, page);
+
+        this.setState({ topStories });
+      }
     } catch (error) {
       ce(`Failed to retrieve stroies!!!`, error);
+
       this.setState({ hasError: true });
     }
   }
 
-  getStoriesByPage = (stories, page) => {
+  _getStoryIdsByPage = (storyIds, page) => {
     const start = (page - 1) * MAX_STORY_COUNT;
     const end = start + MAX_STORY_COUNT;
-    return stories.slice(start, end);
+    return storyIds.slice(start, end);
   };
 
   render() {
-    const { hasError, topStories } = this.state;
-    const page = this.props.match.params.page || 1;
-    const stories = this.getStoriesByPage(topStories, page);
+    const { hasError, topStories: stories } = this.state;
 
     return (
       <div className="App">

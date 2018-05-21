@@ -1,7 +1,5 @@
 import FirebaseApi from "./FirebaseApi";
 
-// const MAX_STORY_COUNT = 20;
-
 class StoryRepostiry {
   endPoints = {
     topStories: "/topstories",
@@ -9,19 +7,28 @@ class StoryRepostiry {
     bestStories: "/beststories"
   };
 
-  getTopStories = async () => this._getStories(this.endPoints.topStories);
-  getNewStories = async () => this._getStories(this.endPoints.newStories);
-  getBestStories = async () => this._getStories(this.endPoints.bestStories);
+  constructor(maxStoryCount) {
+    this.maxStoryCount = maxStoryCount;
+  }
 
-  /**
-   * Get stories for the specified IDs
-   * @param {array} storyIds A list of story IDs to get
-   */
-  async _getStories(endPoint) {
-    const storyIds = await FirebaseApi.fetch(endPoint, { context: this });
-    const stories = storyIds.map((storyId, index) =>
-      this._getStory(storyId, index + 1)
-    );
+  getTopStoryIds = async () =>
+    await FirebaseApi.fetch(this.endPoints.topStories, { context: this });
+  getNewStoryIds = async () =>
+    await FirebaseApi.fetch(this.endPoints.newStories, { context: this });
+  getBestStoryIds = async () =>
+    await FirebaseApi.fetch(this.endPoints.newStories, { context: this });
+
+  // getTopStories = async () => this._getStories(this.endPoints.topStories);
+  // getNewStories = async () => this._getStories(this.endPoints.newStories);
+  // getBestStories = async () => this._getStories(this.endPoints.bestStories);
+
+  async getStoriesByIds(storyIds, page) {
+    const rankOffset = (page - 1) * this.maxStoryCount;
+
+    const stories = storyIds.map((storyId, index) => {
+      const rank = index + 1 + rankOffset;
+      return this._getStory(storyId, rank);
+    });
     return Promise.all(stories);
   }
 
