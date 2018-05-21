@@ -1,6 +1,6 @@
 import FirebaseApi from "./FirebaseApi";
 
-const MAX_STORY_COUNT = 20;
+// const MAX_STORY_COUNT = 20;
 
 class StoryRepostiry {
   endPoints = {
@@ -8,10 +8,6 @@ class StoryRepostiry {
     newStories: "/newstories",
     bestStories: "/beststories"
   };
-
-  constructor(maxStoryCount = MAX_STORY_COUNT) {
-    this.maxStoryCount = maxStoryCount;
-  }
 
   getTopStories = async () => this._getStories(this.endPoints.topStories);
   getNewStories = async () => this._getStories(this.endPoints.newStories);
@@ -23,9 +19,9 @@ class StoryRepostiry {
    */
   async _getStories(endPoint) {
     const storyIds = await FirebaseApi.fetch(endPoint, { context: this });
-    const stories = storyIds
-      .slice(0, this.maxStoryCount)
-      .map((storyId, index) => this._getStory(storyId, index + 1));
+    const stories = storyIds.map((storyId, index) =>
+      this._getStory(storyId, index + 1)
+    );
     return Promise.all(stories);
   }
 

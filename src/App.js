@@ -8,6 +8,8 @@ import StoriesView from "./components/StoriesView";
 const cl = console.log;
 const ce = console.error;
 
+const MAX_STORY_COUNT = 30;
+
 /**
  * This will be the "container" component, which will fetch HN data
  * and pass it on to "view" components.
@@ -22,6 +24,10 @@ class App extends Component {
 
   async componentDidMount() {
     try {
+      // We need to fetch stories only once.
+      const { topStories: stories } = this.state;
+      if (stories.length > 0) return;
+
       const topStories = await this.repository.getTopStories();
       this.setState({ topStories, hasError: false }, () => cl(`Yes!`));
     } catch (error) {
@@ -30,8 +36,16 @@ class App extends Component {
     }
   }
 
+  getStoriesByPage = (stories, page) => {
+    const start = (page - 1) * MAX_STORY_COUNT;
+    const end = start + MAX_STORY_COUNT;
+    return stories.slice(start, end);
+  };
+
   render() {
-    const { hasError } = this.state;
+    const { hasError, topStories } = this.state;
+    const page = this.props.match.params.page || 1;
+    const stories = this.getStoriesByPage(topStories, page);
 
     return (
       <div className="App">
@@ -43,7 +57,7 @@ class App extends Component {
           {hasError ? (
             <div>Error retrieving stories!</div>
           ) : (
-            <StoriesView stories={this.state.topStories} title="Top Stories" />
+            <StoriesView stories={stories} title="Top Stories" />
           )}
         </div>
       </div>
